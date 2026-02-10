@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres:8.15-alpine
+    image: postgres:18.1-alpine3.23
     environment:
       - POSTGRES_DB=roomChatDB
       - POSTGRES_USER=admin
@@ -17,4 +17,4 @@ services:
       - 6379:6379
 
 volumes:
-  roomChatDB:
+  roomChatVol:
