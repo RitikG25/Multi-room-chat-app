@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User{
+  id Int @id @default(autoincrement())
+  name String
+  email String
+  password String
+  SentMessages UserMessages[] @relation("SentMessages")
+  ReceivedMessages UserMessages[] @relation("ReceivedMessages")
+  RoomCreated Room[]
+  JoinedRooms RoomMembers[]
+  roomMessages RoomMessages[]
+}
+
+model UserMessages{
+  id Int @id @default(autoincrement())
+  content String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  sender_id Int
+  receiver_id Int
+  sender   User @relation("SentMessages", fields: [sender_id], references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id])
+}
+
+model Room{
+  id Int @id @default(autoincrement())
+  name String @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  created_by Int
+  user User @relation(references: [id],fields: [created_by])
+  roomMembers RoomMembers[]
+  roomMessages RoomMessages[]
+}
+
+model RoomMembers{
+  id Int @id @default(autoincrement())
+  user_id Int
+  room_id Int
+  joined_at DateTime @default(now())
+  left_at DateTime?
+  user User @relation(fields: [user_id],references: [id])
+  room Room @relation(fields: [room_id],references: [id])
+}
+
+model RoomMessages{
+  id Int @id @default(autoincrement())
+  user_id Int
+  room_id Int
+  content String
+  user User @relation(fields: [user_id],references: [id])
+  room Room @relation(fields: [room_id],references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
